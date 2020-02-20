@@ -202,19 +202,23 @@ MyApp.klass = function (ns, body) {
 }
 
 MyApp.instantiate = function (classNamespace, args) {
-  let cls = null;
+  // let klass = null;
 
-  try {
-    cls = MyApp.evalNamespace(classNamespace);
-  } catch (e) {
-    if (e instanceof MyApp.exceptions.NamespaceNotFound) {
-      throw e.toString();
-    } else {
-      throw e;
-    }
-  }
+  // try {
+  //   klass = MyApp.evalNamespace(classNamespace);
+  // } catch (e) {
+  //   if (e instanceof MyApp.exceptions.NamespaceNotFound) {
+  //     throw e.toString();
+  //   } else {
+  //     throw e;
+  //   }
+  // }
 
-  return new cls(args);
+  // return new klass(args);
+
+  let klass = new Function(`return ${classNamespace};`)();
+
+  return new klass(args);
 }
 
 defineConsts(MyApp.exceptions, {
