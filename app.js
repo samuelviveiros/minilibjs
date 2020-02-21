@@ -78,6 +78,54 @@ MyApp.exceptions.InvalidNamespace = class extends MyApp.exceptions.BaseError {
   get NAME () { return 'InvalidNamespace' }
 };
 
+MyApp.showProtoChain = function (instance) {
+  // let prototype = instance;
+  // let protoChain = [];
+
+  // try {
+  //   while (true) {
+  //     prototype = Object.getPrototypeOf(prototype);
+  //     protoChain.push(prototype.constructor.name);
+  //   }
+  // } finally {
+  //   return protoChain.reverse();
+  // }
+
+  // let prototype = instance;
+  // let protoChain = {};
+
+  // try {
+  //   while (true) {
+  //     prototype = Object.getPrototypeOf(prototype);
+  //     protoChain[prototype.constructor.name] = new Object();
+  //     Object.assign(protoChain[prototype.constructor.name], prototype);
+  //   }
+  // } finally {
+  //   return protoChain;
+  // }
+
+  let prototype = instance;
+  let protoChain = {};
+
+  try {
+    while (true) {
+      prototype = Object.getPrototypeOf(prototype);
+      // protoChain[prototype.constructor.name] = new Array();
+      // for (property in prototype) {
+      //   if (prototype.hasOwnProperty(property)) {
+      //     protoChain[prototype.constructor.name].push(property);
+      //   }
+      // }
+      protoChain[prototype.constructor.name] = Object.getOwnPropertyNames(prototype);
+      // if (!protoChain[prototype.constructor.name].find(i => i === 'constructor')) {
+      //   protoChain[prototype.constructor.name].push('constructor');
+      // }
+    }
+  } finally {
+    return protoChain;
+  }
+}
+
 MyApp.evalNamespace = function (namespace) {
   try {
     result = eval(namespace);
@@ -178,7 +226,7 @@ MyApp.klass = function (ns, body) {
   let funcBody = `return function ${className} (args) { this.init(args) }`;
   defineConst(classPath, className, new Function(funcBody)());
 
-  // Inheritance...
+  // Add superclass members (inheritance).
   if (typeof config.body.extend === 'string') {
     let parent = null;
 
@@ -198,6 +246,15 @@ MyApp.klass = function (ns, body) {
     }
   }
 
+  // Add constructor property.
+  Object.defineProperty(classPath[className].prototype, 'constructor', {
+    value: classPath[className],
+    configurable: true,
+    enumerable: false,
+    writable: true
+  });
+
+  // Add subclass members.
   Object.assign(classPath[className].prototype, config.body);
 }
 
@@ -315,15 +372,15 @@ let myObj3 = MyApp.instantiate(
   { field1: 'value1', field2: 'value2' }
 );
 
-// window.FooA = class {
-//     constructor () {
-//         console.info('FooA');
-//     }
-// }
+window.FooA = class {
+    constructor () {
+        console.info('FooA');
+    }
+}
 
-// window.FooB = class extends window.FooA {
-//     constructor () {
-//         super();
-//         console.info('FooB');
-//     }
-// }
+window.FooB = class extends window.FooA {
+    constructor () {
+        super();
+        console.info('FooB');
+    }
+}
