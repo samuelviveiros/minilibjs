@@ -67,18 +67,32 @@ MyApp.exceptions.NamespaceNotFound = class extends MyApp.exceptions.BaseError {
 
   // static get NAME () { return 'NamespaceNotFound' }  // only class
 
-  get NAME () { return 'NamespaceNotFound' }  // only instance
+  get NAME() { return 'NamespaceNotFound' }  // only instance
 };
 
 MyApp.exceptions.InvalidClassConfig = class extends MyApp.exceptions.BaseError {
-  get NAME () { return 'InvalidClassConfig' }
+  get NAME() { return 'InvalidClassConfig' }
 };
 
 MyApp.exceptions.InvalidNamespace = class extends MyApp.exceptions.BaseError {
-  get NAME () { return 'InvalidNamespace' }
+  get NAME() { return 'InvalidNamespace' }
 };
 
-MyApp.showProtoChain = function (instance) {
+MyApp.getAllPropertyNames = function (obj) {
+  var props = [];
+
+  do {
+    Object.getOwnPropertyNames(obj).forEach(function (prop) {
+      if (props.indexOf(prop) === -1) {
+        props.push(prop);
+      }
+    });
+  } while (obj = Object.getPrototypeOf(obj));
+
+  return props;
+}
+
+MyApp.getProtoChain = function (instance) {
   // let prototype = instance;
   // let protoChain = [];
 
@@ -373,14 +387,14 @@ let myObj3 = MyApp.instantiate(
 );
 
 window.FooA = class {
-    constructor () {
-        console.info('FooA');
-    }
+  constructor() {
+    console.info('FooA');
+  }
 }
 
 window.FooB = class extends window.FooA {
-    constructor () {
-        super();
-        console.info('FooB');
-    }
+  constructor() {
+    super();
+    console.info('FooB');
+  }
 }
