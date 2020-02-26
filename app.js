@@ -93,50 +93,25 @@ MyApp.getAllPropertyNames = function (obj) {
 }
 
 MyApp.getProtoChain = function (instance) {
-  // let prototype = instance;
-  // let protoChain = [];
-
-  // try {
-  //   while (true) {
-  //     prototype = Object.getPrototypeOf(prototype);
-  //     protoChain.push(prototype.constructor.name);
-  //   }
-  // } finally {
-  //   return protoChain.reverse();
-  // }
-
-  // let prototype = instance;
-  // let protoChain = {};
-
-  // try {
-  //   while (true) {
-  //     prototype = Object.getPrototypeOf(prototype);
-  //     protoChain[prototype.constructor.name] = new Object();
-  //     Object.assign(protoChain[prototype.constructor.name], prototype);
-  //   }
-  // } finally {
-  //   return protoChain;
-  // }
-
   let prototype = instance;
-  let protoChain = {};
+  let protoChain = [];
+  let allProperties = [];
 
   try {
     while (true) {
       prototype = Object.getPrototypeOf(prototype);
-      // protoChain[prototype.constructor.name] = new Array();
-      // for (property in prototype) {
-      //   if (prototype.hasOwnProperty(property)) {
-      //     protoChain[prototype.constructor.name].push(property);
-      //   }
-      // }
-      protoChain[prototype.constructor.name] = Object.getOwnPropertyNames(prototype);
-      // if (!protoChain[prototype.constructor.name].find(i => i === 'constructor')) {
-      //   protoChain[prototype.constructor.name].push('constructor');
-      // }
+      let temp = new Object();
+      let properties = Object.getOwnPropertyNames(prototype);
+      temp[prototype.constructor.name] = properties;
+      protoChain.push(temp);
+
+      allProperties = [...new Set([...allProperties, ...properties])];
     }
   } finally {
-    return protoChain;
+    let temp = new Object();
+    temp['__inherited__'] = allProperties;
+    protoChain.push(temp);
+    return protoChain.reverse();
   }
 }
 
